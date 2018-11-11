@@ -15,9 +15,15 @@ def main():
 					break
 				print(data)
 				obj = json.loads(data)
-				print(obj)
-				print(obj["msg"])
-				print(obj["size"])
-				conn.sendall(data)
+				if len(obj["username"]) == 0 :
+					print("no nick found")
+					data = {"status":1, "description":"no nick found"}
+					conn.sendall(data)
+				else :
+					print( "welcome, {}".format(obj["username"]))
+					data = {"status":0}
+					data = json.dumps(data)
+					data = bytes(data, 'utf-8')
+					conn.sendall(data)
 if(__name__=="__main__"):
 	main()
