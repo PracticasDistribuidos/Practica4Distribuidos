@@ -60,17 +60,20 @@ def main():
 			return 
 		else :
 			print("welcome to the chat, {}".format(nick))
-			opt = showmenu()
-			if opt == "1" :
-				sendPublicMessage(s, nick)
-			elif opt=="2" :
-				checkOnlineUsers(s, nick)
-			elif opt=="3" :
-				sendPrivateMessage(s, nick)
-			elif opt=="4" :
-				exitChat(s, nick)
-			else :
-				print("nothing")
+			while True:
+				opt = showmenu()
+				if opt == "1" :
+					sendPublicMessage(s, nick)
+				elif opt=="2" :
+					checkOnlineUsers(s, nick)
+				elif opt=="3" :
+					sendPrivateMessage(s, nick)
+				elif opt=="4" :
+					exitChat(s, nick)
+					break
+				else :
+					print("nothing")
+		s.close()
 
 if(__name__=="__main__"):
 	main()

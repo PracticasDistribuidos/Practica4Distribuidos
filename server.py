@@ -51,11 +51,13 @@ def main():
 					data = json.dumps(data)
 					data = bytes(data, 'utf-8')
 					conn.sendall(data)
+					break
 				else :			
 					print(obj)
 					data = {"status":0}
 					data = json.dumps(data)
 					data = bytes(data, 'utf-8')
-					conn.sendall(data)	
+					conn.sendall(data)
+		s.close()	
 if(__name__=="__main__"):
 	main()
