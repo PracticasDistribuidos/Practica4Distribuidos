@@ -10,11 +10,13 @@ def sendPublicMessage(s, nick):
 	if response["status"] == 1 :
 		print("\n{},\n".format(response["description"]))
 def checkOnlineUsers(s, nick):
-	message = input("Mensaje: ")
-	data = {"opt":2,"username":nick, "message":message}
+	data = {"opt":2,"username":nick}
 	response = sendMsg(data, s)
 	if response["status"] == 1 :
-		print("\n{},\n".format(response["description"]))	
+		print("\n{},\n".format(response["description"]))
+	else:
+		for x in response["users"]:
+			print(x)	
 def sendPrivateMessage(s, nick):
 	recipient = input("Destinatario: ")
 	message = input("Mensaje: ")
@@ -38,7 +40,6 @@ def showmenu():
 	return option
 
 def sendMsg(msg, s):
-	s.connect((HOST, PORT))
 	msg = json.dumps(msg)
 	msg = bytes(msg, 'utf-8')
 	s.sendall(msg)
@@ -52,6 +53,7 @@ def main():
 	msg = {"opt":0,"username":nick}
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+		s.connect((HOST, PORT))
 		response = sendMsg(msg, s)
 		if response["status"] != 0 :
 			print("Oops")

@@ -35,7 +35,7 @@ def main():
 					conn.sendall(data)
 				elif obj["opt"] == 2:
 					print(obj)
-					data = {"status":0}
+					data = {"status":0, "users":["nick","joe", "pan"]}
 					data = json.dumps(data)
 					data = bytes(data, 'utf-8')
 					conn.sendall(data)
