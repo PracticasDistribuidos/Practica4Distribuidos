@@ -58,8 +58,8 @@ def reciever(s):
 			#response from public message
 			#{type: "SEND_MESSAGE",sender: username,message: message}
 			elif response["type"] == "MESSAGE" :
-#				print(response)
-				print('\n{}:\n{}\n'.format(response["sender"], reponse["message"]))
+				print('\n{}:'.format(response["sender"]))
+				print('\t{}'.format(response["message"]))
 			#response from private message
 			#{type: "SEND_MESSAGE",sender: username,message: message}
 			#elif response["type"] == "SEND_MESSAGE" :
