@@ -2,7 +2,7 @@ import socket
 import json
 import threading
 HOST = '127.0.0.1'
-PORT = 6969
+PORT = 6788
 
 def sendPublicMessage(s, nick):
 	message = input("Mensaje: ")
@@ -44,7 +44,7 @@ def reciever(s):
 			
 			#response from public message
 			#{type: "SEND_MESSAGE",sender: username,message: message}
-			elif response["type"] == "SEND_MESSAGE" :
+			if response["type"] == "SEND_MESSAGE" :
 				print("\n{}(PUBLIC):\n{}\n".format(response["sender"], reponse["message"]))
 			#response from online users
 			#{type: "USER_LIST",users: [User A, User B, ...]}
