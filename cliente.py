@@ -82,7 +82,7 @@ def main():
 		
 		response = json.loads(data)
 		if response["type"] == "ERROR" :
-			print("Oops, {}").format(response["description"])
+			print("Oops, {}".format(response["description"]))
 			return 
 		else :
 			print("welcome to the chat, {}".format(nick))
