@@ -53,7 +53,7 @@ def reciever(s):
 					print(x)
 			#response from private message
 			#{type: "SEND_MESSAGE",sender: username,message: message}
-			elif response["TYPE"] == "SEND_MESSAGE" :
+			elif response["type"] == "SEND_MESSAGE" :
 				print("\n{}(PRIVATE):\n{}\n".format(response["sender"], reponse["message"]))
 			#response from exit chat
 			#{type: "ACKNOWLEDGE",description: "EXIT_OK"}
