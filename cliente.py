@@ -39,27 +39,31 @@ def reciever(s):
 			print("Failed conection")
 			continue
 		response = json.loads(data.decode('utf-8'))
-		print(response)
+#		print(response)
 		if response["type"] == "ERROR" :
 			print("\n{},\n".format(response["description"]))
 		else:
+#			print("soy el else")
+#			print(response)
 			#response from conection, doesn't apply
 			#if response["opt"]:
 			#	print("\n{}".format(response["username"]))
 			
-			#response from public message
-			#{type: "SEND_MESSAGE",sender: username,message: message}
-			if response["type"] == "SEND_MESSAGE" :
-				print("\n{}(PUBLIC):\n{}\n".format(response["sender"], reponse["message"]))
 			#response from online users
 			#{type: "USER_LIST",users: [User A, User B, ...]}
-			elif response["type"] == "USER_LIST" :
+			if response["type"] == "USER_LIST" :
+				print("online users:\n")
 				for x in response["users"]:
 					print(x)
+			#response from public message
+			#{type: "SEND_MESSAGE",sender: username,message: message}
+			elif response["type"] == "MESSAGE" :
+#				print(response)
+				print('\n{}:\n{}\n'.format(response["sender"], reponse["message"]))
 			#response from private message
 			#{type: "SEND_MESSAGE",sender: username,message: message}
-			elif response["type"] == "SEND_MESSAGE" :
-				print("\n{}(PRIVATE):\n{}\n".format(response["sender"], reponse["message"]))
+			#elif response["type"] == "SEND_MESSAGE" :
+			#	print("\n{}(PRIVATE):\n{}\n".format(response["sender"], reponse["message"]))
 			#response from exit chat
 			#{type: "ACKNOWLEDGE",description: "EXIT_OK"}
 			elif response["type"] == "ACKNOWLEDGE" :
@@ -69,12 +73,12 @@ def reciever(s):
 				print("Nothing")
 def main():
 	nick = input("Nick: ")
-	msg = {"type":"CONNECT","username":nick}
+	msg = {"type":"CONNECT","nick":nick}
 	with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
 		s.connect((HOST, PORT))
 		sendMsg(msg, s)
 		data = s.recv(1024)
-		print(data)
+#		print(data)
 		
 		response = json.loads(data)
 		if response["type"] == "ERROR" :
