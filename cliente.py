@@ -9,7 +9,7 @@ def sendPublicMessage(s, nick):
 	data = {"type": "SEND_MESSAGE","destinatary": "ALL","message": message}
 	sendMsg(data, s)
 def checkOnlineUsers(s, nick):
-	data = {type: "LIST_USERS"}
+	data = {"type": "LIST_USERS"}
 	sendMsg(data, s)
 def sendPrivateMessage(s, nick):
 	recipient = input("Destinatario: ")
@@ -33,9 +33,14 @@ def sendMsg(msg, s):
 	s.sendall(msg)
 def reciever(s):
 	while True:
-		data = s.recv(1024)
-		response = json.loads(data)
-		if response["status"] == 1 :
+		try:
+			data,address = s.recvfrom(1024)
+		except:
+			print("Failed conection")
+			continue
+		response = json.loads(data.decode('utf-8'))
+		print(response)
+		if response["type"] == "ERROR" :
 			print("\n{},\n".format(response["description"]))
 		else:
 			#response from conection, doesn't apply
@@ -65,11 +70,12 @@ def reciever(s):
 def main():
 	nick = input("Nick: ")
 	msg = {"type":"CONNECT","username":nick}
-	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+	with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
 		s.connect((HOST, PORT))
 		sendMsg(msg, s)
 		data = s.recv(1024)
 		print(data)
+		
 		response = json.loads(data)
 		if response["type"] == "ERROR" :
 			print("Oops, {}").format(response["description"])
