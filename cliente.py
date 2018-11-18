@@ -6,36 +6,19 @@ PORT = 6969
 
 def sendPublicMessage(s, nick):
 	message = input("Mensaje: ")
-	data = {"opt":1,"username":nick, "message":message}
+	data = {"type": "SEND_MESSAGE","destinatary": "ALL","message": message}
 	sendMsg(data, s)
-#	response = sendMsg(data, s)
-#	if response["status"] == 1 :
-#		print("\n{},\n".format(response["description"]))
 def checkOnlineUsers(s, nick):
-	data = {"opt":2,"username":nick}
+	data = {type: "LIST_USERS"}
 	sendMsg(data, s)
-#	response = sendMsg(data, s)
-#	if response["status"] == 1 :
-#		print("\n{},\n".format(response["description"]))
-#	else:
-#		for x in response["users"]:
-#			print(x)	
 def sendPrivateMessage(s, nick):
 	recipient = input("Destinatario: ")
 	message = input("Mensaje: ")
-	data = {"opt":3,"username":nick, "recipient":recipient, "message":message}
+	data = {"type": "SEND_MESSAGE","destinatary": recipient,"message": message}
 	sendMsg(data, s)
-#	response = sendMsg(data, s)
-#	if response["status"] == 1 :
-#		print("\n{},\n".format(response["description"]))
 def exitChat(s, nick):
-	data = {"opt":4,"username":nick}
+	data = {"type": "EXIT"}
 	sendMsg(data, s)
-#	response = sendMsg(data, s)
-#	if response["status"] == 1 :
-#		print("\n{},\n".format(response["description"]))
-#	elif response["status"] == 0 :	
-#		print("You're offline.")
 def showMenu():
 	print("\n1) Enviar un mensaje público que será enviado a todos los usuarios.")
 	print("\n2) Consultar los usuarios conectados.")
@@ -44,53 +27,55 @@ def showMenu():
 def getOption():
 	option = input("\nQue quieres hacer? ")
 	return option
-
 def sendMsg(msg, s):
 	msg = json.dumps(msg)
 	msg = bytes(msg, 'utf-8')
 	s.sendall(msg)
-#	data = s.recv(1024)
-	#data = repr(data)
-#	response = json.loads(data)
-#	return response
 def reciever(s):
 	while True:
 		data = s.recv(1024)
-		#data = repr(data)
 		response = json.loads(data)
 		if response["status"] == 1 :
 			print("\n{},\n".format(response["description"]))
 		else:
-			if response["opt"] == 0 :
-				print("\n{}".format(response["username"]))
-			elif response["opt"] == 1 :
-				print("\n{}:\n{}\n".format(response["username"], reponse["message"]))
-			elif response["opt"] == 2 :
+			#response from conection, doesn't apply
+			#if response["opt"]:
+			#	print("\n{}".format(response["username"]))
+			
+			#response from public message
+			#{type: "SEND_MESSAGE",sender: username,message: message}
+			elif response["type"] == "SEND_MESSAGE" :
+				print("\n{}(PUBLIC):\n{}\n".format(response["sender"], reponse["message"]))
+			#response from online users
+			#{type: "USER_LIST",users: [User A, User B, ...]}
+			elif response["type"] == "USER_LIST" :
 				for x in response["users"]:
 					print(x)
-			elif response["opt"] == 3 :
-				print("\n{}:\n{}\n".format(response["username"], reponse["message"]))
-			elif response["opt"] == 4 :
+			#response from private message
+			#{type: "SEND_MESSAGE",sender: username,message: message}
+			elif response["TYPE"] == "SEND_MESSAGE" :
+				print("\n{}(PRIVATE):\n{}\n".format(response["sender"], reponse["message"]))
+			#response from exit chat
+			#{type: "ACKNOWLEDGE",description: "EXIT_OK"}
+			elif response["type"] == "ACKNOWLEDGE" :
 				print("\n{} is offline\n".format(response["username"]))
+			#wierd response
 			else:
 				print("Nothing")
 def main():
 	nick = input("Nick: ")
-	msg = {"opt":0,"username":nick}
+	msg = {"type":"CONNECT","username":nick}
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 		s.connect((HOST, PORT))
 		sendMsg(msg, s)
 		data = s.recv(1024)
 		print(data)
 		response = json.loads(data)
-#		print(response)
-		if response["status"] == "1" or  response["status"] == 1 or response["status"] == '1':
-			print("Oops")
+		if response["type"] == "ERROR" :
+			print("Oops, {}").format(response["description"])
 			return 
 		else :
 			print("welcome to the chat, {}".format(nick))
-#			senderT = threading.Thread(name='sender', target=sender, args=[s], daemon=True)
-#			senderT.start()
 			recieverT = threading.Thread(name='reciever', target=reciever, args=[s], daemon=True)
 			recieverT.start()
 			while True:
@@ -106,8 +91,7 @@ def main():
 					exitChat(s, nick)
 					break
 				else :
-					print("nothing")
-			
+					print("nothing")			
 		s.close()
 
 if(__name__=="__main__"):
