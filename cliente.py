@@ -3,7 +3,7 @@ import json
 import threading
 HOST = '127.0.0.1'
 PORT = 6788
-
+blockedUsers = {} 
 def sendPublicMessage(s, nick):
 	message = input("Mensaje: ")
 	data = {"type": "SEND_MESSAGE","destinatary": "ALL","message": message}
@@ -19,11 +19,29 @@ def sendPrivateMessage(s, nick):
 def exitChat(s, nick):
 	data = {"type": "EXIT"}
 	sendMsg(data, s)
+def printBlockedUsers():
+	print("Blocked Users:")
+	for key, value in blockedUsers.items():
+			print("{}:{}\n".format(key,value))
+def blockUser(s, nick):
+	user = input("Username:")
+	if not (user in blockedUsers):
+		blockedUsers[user] = True
+		data = {"type": "BLOCK_USER", "user":user}
+	else:
+		if blockedUsers[user]:
+			data = {"type": "UNBLOCK_USER", "user":user}
+		else:
+			data = {"type": "BLOCK_USER", "user":user}
+		blockedUsers[user] = not blockedUsers[user]
+	sendMsg(data, s)
 def showMenu():
 	print("\n1) Enviar un mensaje público que será enviado a todos los usuarios.")
 	print("\n2) Consultar los usuarios conectados.")
 	print("\n3) Enviar un mensaje privado a un usuario.")
 	print("\n4) Salir del chat.")
+	print("\n5) Imprimir la lista de usuarios bloqueados")
+	print("\n6) Bloquear/Desbloquear un usuario.")
 def getOption():
 	option = input("\nQue quieres hacer? ")
 	return option
@@ -67,7 +85,11 @@ def reciever(s):
 			#response from exit chat
 			#{type: "ACKNOWLEDGE",description: "EXIT_OK"}
 			elif response["type"] == "ACKNOWLEDGE" :
-				print("\n{} is offline\n".format(response["username"]))
+				if response["description"] == "USER_BLOCKED":
+					print("User is blocked")
+				elif response["description"] == "USER_UNBLOCKED":
+					print("User is unblocked")
+				#print("\n{} is offline\n".format(response["username"]))
 			#wierd response
 			else:
 				print("Nothing")
@@ -100,6 +122,10 @@ def main():
 				elif opt=="4" :
 					exitChat(s, nick)
 					break
+				elif opt=="5" :
+					printBlockedUsers()
+				elif opt=="6" :
+					blockUser(s, nick)
 				else :
 					print("nothing")			
 		s.close()
