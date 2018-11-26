@@ -1,6 +1,7 @@
 import socket
 import json
 import threading
+import getpass
 HOST = '127.0.0.1'
 PORT = 6788
 blockedUsers = {} 
@@ -95,7 +96,8 @@ def reciever(s):
 				print("Nothing")
 def main():
 	nick = input("Nick: ")
-	msg = {"type":"CONNECT","nick":nick}
+	password = getpass.getpass('Password: ')
+	msg = {"type":"CONNECT","nick":nick, "password":password}
 	with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
 		s.connect((HOST, PORT))
 		sendMsg(msg, s)
@@ -108,6 +110,10 @@ def main():
 			return 
 		else :
 			print("welcome to the chat, {}".format(nick))
+			if response["type"] == "INBOX":
+				print("New Messages:\n")
+				for message in response["inbox"]:
+					print("{}:\n\t{}\n".format(message["sender"], message["message"]))
 			recieverT = threading.Thread(name='reciever', target=reciever, args=[s], daemon=True)
 			recieverT.start()
 			while True:
